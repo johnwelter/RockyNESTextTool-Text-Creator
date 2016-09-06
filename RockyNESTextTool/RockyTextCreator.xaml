@@ -1,0 +1,55 @@
+﻿<Window x:Class="RockyNESTextTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RockyNESTextTool"
+        mc:Ignorable="d"
+        Title="Rocky NES Text Creator" Height="442.988" Width="698.954">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="381*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="233*"/>
+            <ColumnDefinition Width="295*"/>
+            <ColumnDefinition Width="166*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="264" TextWrapping="Wrap" VerticalAlignment="Top" Width="276" Margin="10,101,0,0" Grid.Column="1" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Visible" TextChanged="text_TextChanged" PreviewTextInput="TextValidationTextBox"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="24" Margin="10,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" Grid.Column="1" TextChanged="label_TextChanged" Grid.Row="1" PreviewTextInput="LabelValidationTextBox"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Height="20" Margin="10,15,0,0" TextWrapping="Wrap" Text="Label" VerticalAlignment="Top" Width="196" Grid.Column="1" Grid.Row="1"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Height="20" Margin="10,77,0,0" TextWrapping="Wrap" Text="Text" VerticalAlignment="Top" Width="196" Grid.Column="1" Grid.Row="1"/>
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="294" Margin="10,40,0,0" VerticalAlignment="Top" Width="205" SelectionChanged="listView_SelectionChanged" Grid.Row="1">
+            <ListView.View>
+                <GridView AllowsColumnReorder="False"
+                          ColumnHeaderToolTip="Availible Data">
+                    <GridViewColumn Header="Label" Width="170" DisplayMemberBinding="{Binding Path = label}"/>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="Add" Content="Add" HorizontalAlignment="Left" Height="26" Margin="10,341,0,0" VerticalAlignment="Top" Width="98" Click="button_Click" Grid.Row="1"/>
+        <Button x:Name="Delete" Content="Delete" HorizontalAlignment="Left" Height="26" Margin="117,341,0,0" VerticalAlignment="Top" Width="98" Click="button_Click" Grid.Row="1"/>
+        <ToolBarTray HorizontalAlignment="Left" Height="34" VerticalAlignment="Top" Width="694" Grid.ColumnSpan="3">
+            <ToolBar x:Name="toolBar" HorizontalAlignment="Left" Height="34" VerticalAlignment="Top" Width="526" Margin="0,0,-502,-21">
+                <Button x:Name="New" Content="New" Height="24" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="0,2,0,0"/>
+                <Button x:Name="Open" Content="Open" Height="24" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="0,2,0,0"/>
+                <Button x:Name="Save" Content="Save" Height="24" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="0,2,0,0"/>
+                <Button x:Name="Export" Content="Export" Height="24" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="0,2,0,0"/>
+                <Button x:Name="Info" Content="Info" Height="24" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="0,2,0,0"/>
+            </ToolBar>
+        </ToolBarTray>
+        <TextBlock x:Name="FileName" HorizontalAlignment="Left" Height="20" Margin="10,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" Grid.Row="1"><Run Text="Texts"/><LineBreak/><Run/></TextBlock>
+        <Label x:Name="label" Content="Key Codes" Grid.Column="2" HorizontalAlignment="Left" Margin="54,9,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="2.569,2.571"/>
+        <Label x:Name="label1" Content="N = Line Break" Grid.Column="2" HorizontalAlignment="Left" Margin="10,40,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label1_Copy" Content="L = Loop from Beggining" Grid.Column="2" HorizontalAlignment="Left" Margin="10,71,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label1_Copy1" Content="W = Wait for Input" Grid.Column="2" HorizontalAlignment="Left" Margin="10,102,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label1_Copy2" Content="R = Force Text Box Reset" Grid.Column="2" HorizontalAlignment="Left" Margin="10,133,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label_Copy" Content="Additive Codes" Grid.Column="2" HorizontalAlignment="Left" Margin="40,172,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="2.569,2.571"/>
+        <Label x:Name="label_Copy1" Content="(followed by int in form &#xD;&#xA;            of &quot;000&quot;)" Grid.Column="2" HorizontalAlignment="Left" Margin="16,194,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="2.569,2.571" Height="52"/>
+        <Label x:Name="label1_Copy3" Content="S = set speed&#xD;&#xA;" Grid.Column="2" HorizontalAlignment="Left" Margin="10,246,0,0" Grid.Row="1" VerticalAlignment="Top" Height="30"/>
+        <Label x:Name="label1_Copy4" Content="P = pause&#xA;" Grid.Column="2" HorizontalAlignment="Left" Margin="10,281,0,0" Grid.Row="1" VerticalAlignment="Top" Height="30"/>
+
+    </Grid>
+</Window>
