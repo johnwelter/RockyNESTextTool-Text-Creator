@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * Text File
+ * 
+ * John Welter
+ * 2016
+ * 
+ * a collection of text data
+ * 
+ * observable by the main prograim to update automatically
+ * 
+ */
+
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

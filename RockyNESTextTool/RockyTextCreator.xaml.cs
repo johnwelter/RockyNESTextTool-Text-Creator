@@ -1,4 +1,18 @@
-﻿using System;
+﻿/*
+ * RockyTextCreator
+ * 
+ * John Welter
+ * 2016
+ * 
+ * visual program to aid in creation of NES text files
+ * 
+ * keeps a data base of text data blocks, which can be converted into readable chunks of data by an NES assembler
+ * can also save projects as XML files to be converted later
+ * 
+ */
+
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -26,14 +40,24 @@ namespace RockyNESTextTool
     public partial class MainWindow : Window
     {
 
-
         private String flname = "";
-        private txtData currentData = new txtData();
+        private txtData currentData = new txtData(); 
         private int currentDataIndex = 0;
         private ObservableCollection<txtData> currentFile = new ObservableCollection<txtData>();
-        private String charTable = "0123456789abcdefghijklmnopqrstuvwxyz.?!,:'\"%~$-*";
+        private String charTable = "0123456789abcdefghijklmnopqrstuvwxyz.?!,:'\"%~$-*"; // all acceptable characters
         private bool extraDataCheck = false;
-        private txtData dummyTxt = new txtData();
+        private txtData dummyTxt = new txtData(); // creates dummy text to use as a buffer when starting/ deleting
+
+        //conversion values
+        bool parseTest;
+        String output;
+        String tab;
+        char ptr;
+        int counter;
+        int chars;
+        int parse;
+
+       //////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public MainWindow()
         {
@@ -49,33 +73,33 @@ namespace RockyNESTextTool
 
         private void text_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox T = (TextBox)sender;
-            currentData.text = T.Text;
+            TextBox TextDataText = (TextBox)sender;
+            currentData.text = TextDataText.Text; //sets text of current data to what's in the text box
         }
 
         private void label_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox T = (TextBox)sender;
-            currentData.label = T.Text;
+            TextBox LabelText = (TextBox)sender; 
+            currentData.label = LabelText.Text; //sets label of current data to what's in the label box
         }
         
         
         private void TextValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[^-0-9a-z.?!,:'\"%~$-*RNLWPS]+");
+            Regex regex = new Regex("[^-0-9a-z.?!,:'\"%~$-*RNLWPS]+"); // allows only acceptable input to text box
             e.Handled = regex.IsMatch(e.Text);
         }
         private void LabelValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[^-0-9a-zA-Z_]+");
+            Regex regex = new Regex("[^-0-9a-zA-Z_]+"); // allows only acceptable input to label box
             e.Handled = regex.IsMatch(e.Text);
         }
 
         private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            ListView L = (ListView)sender;
-            currentDataIndex = L.SelectedIndex;
+            ListView L = (ListView)sender;          
+            currentDataIndex = L.SelectedIndex;     //changes label and text box to link to selected data
             currentData = (txtData)L.SelectedItem;
             if(currentData != null)
             {
@@ -85,20 +109,15 @@ namespace RockyNESTextTool
             
         }
 
-        //conversion values
-        bool parseTest;
-        String output;
-        String tab;
-        char ptr;
-        int counter;
-        int chars;
-        int parse;
+       
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Button clicked = (Button)sender;
             if (clicked.Name.Equals("New"))
             {
+                //creates new file. does not automatically save changes.
+                
                 //Console.WriteLine("Make new file/nask before continuing/nclose old file, open new");
                 MessageBoxResult confirmOpen = MessageBox.Show("Starting a new file will close the current file. Any unsaved changes will be lost.", "Confirmation", MessageBoxButton.OKCancel);
 
@@ -116,6 +135,9 @@ namespace RockyNESTextTool
             else if (clicked.Name.Equals("Open"))
             {
                
+                //opens file from XML. does not automatically save changes.
+
+
                 //Console.WriteLine("Open another file/nask before continuing/nclose old file, open new");
                 MessageBoxResult confirmOpen = MessageBox.Show("Opening another file will close the current file. Any unsaved changes will be lost.", "Confirmation", MessageBoxButton.OKCancel);
             
@@ -145,6 +167,9 @@ namespace RockyNESTextTool
             }
             else if (clicked.Name.Equals("Save"))
             {
+
+                //saves text file as XML
+
                 //Console.WriteLine("Save current file");
                 //SaveFileDialog saveFileDialog = new SaveFileDialog();
                 //saveFileDialog.Filter = "Rocky NES Text (*.rnt)|*.rnt";
@@ -179,6 +204,9 @@ namespace RockyNESTextTool
 
             else if (clicked.Name.Equals("Export"))
             {
+
+                //exports NES readable file by converting each text data into a block of bytes
+
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 saveFileDialog.Filter = "NES data file (*.i)|*.i|ASM file (*.asm)|*.asm";
                 if (saveFileDialog.ShowDialog() == true)
@@ -206,6 +234,9 @@ namespace RockyNESTextTool
             }
             else if(clicked.Name.Equals("Add"))
             {
+
+                //creates new text data and adds it to the file
+
                 txtData TD = new txtData();
                 TD.label = "NewData";
                 TD.text = "newtext";
@@ -216,7 +247,9 @@ namespace RockyNESTextTool
             }
             else if(clicked.Name.Equals("Delete"))
             {
-                if(listView.SelectedIndex >= 0)
+                //removes selected data from file 
+
+                if (listView.SelectedIndex >= 0)
                 {
                     currentFile.RemoveAt(listView.SelectedIndex);
                     currentData = dummyTxt;
@@ -232,7 +265,7 @@ namespace RockyNESTextTool
 
             }
         }
-        /*
+        /* better extra data check - in production
         private void extraData(int amount, int sections, char code)
         {
             if(amount%sections != 0)
@@ -287,24 +320,37 @@ namespace RockyNESTextTool
         }
         private String convert(String input)
         {
-
             resetConvertValues();
 
-            //tab, .db, data (up to 16 per line), break
-            //at [, read commands/ values till]
+            // INPUT - text of current text data to be converted
+            //
+            //converts a single text data to the format:
+            //Label:
+            //tab, .db, hex data (up to 16 per line), break
+
+            //IE
+            //label:    Butts
+            //text :    butts are cool, bruh dude
+            //
+            //Butts:
+            //  .db $0B, $1E, $1D, $1D, $1C, $FA, $0A, $1B, $0C, $18, $18, $15, $27, $FA, $0B, $1B
+            //  .db $1E, $11, $FA, $0D, $1E, $0D, $0E, $FF
+
 
             while(counter < input.Length)
             {
                 //Console.WriteLine(counter.ToString());
-                ptr = input[counter];
+                ptr = input[counter];   // gets character at the input
                 //Console.WriteLine(ptr);
-                parse = charTable.IndexOf(ptr);
+                parse = charTable.IndexOf(ptr); // gets the value of the character from the character table
                 if(!extraDataCheck && parse != -1)
-                {
+                {   
+                    //if there's no additioanl data to check for and parse is not a command, add it to the output
                     output += "$" + parse.ToString("X2");
                 }
                 else
                 {
+                    //if there's extra data to parse, gather the next three characters, and convert them into one Hex value
                     if(extraDataCheck)
                     {
                         String tempOut = "";
@@ -335,16 +381,7 @@ namespace RockyNESTextTool
                             
                         }
 
-                        
-
                     }
-                    /*
-                     * 
-                     * needs more stuff in the register string thingy to make sure there's only one number after S or P for frame pauses.
-                     * add another letter later for input waits
-                     * 
-                     * 
-                    */
                     /*
                     else if(ptr == 'Q')
                     {
